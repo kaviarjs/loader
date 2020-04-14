@@ -24,7 +24,10 @@ export interface LoadOptions {
 }
 
 export interface SubscriptionFunctionMap {
-  [key: string]: FunctionMap;
+  [key: string]: {
+    subscribe: (root: any, args: any, context: any, info: any) => any;
+    resolve?: (payload: any) => any;
+  };
 }
 
 export type ContextReducer = (context: any) => any;

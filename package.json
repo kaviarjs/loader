@@ -1,7 +1,7 @@
 {
-  "name": "@kaviar/graphql",
+  "name": "@kaviar/loader",
   "version": "1.0.0",
-  "description": "Loading GraphQL API Definitions",
+  "description": "Loading Strategy for GraphQL Modules",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "@types/node": "^8.0.28",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "graphql": "^15.0.0",
     "istanbul": "^1.0.0-alpha.2",
     "mocha": "^6.2.2",
     "reflect-metadata": "^0.1.13",
