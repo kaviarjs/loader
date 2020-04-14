@@ -21,7 +21,7 @@
     "gen-doc": "typedoc ./src --out typeDocs --tsconfig tsconfig.json"
   },
   "dependencies": {
-    "@graphql-toolkit/schema-merging": "^0.9.12"
+    "@graphql-toolkit/schema-merging": "^0.10.3"
   },
   "peerDependencies": {
     "graphql": "^15.0.0"
