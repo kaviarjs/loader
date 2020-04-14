@@ -1,6 +1,6 @@
 {
   "name": "@kaviar/loader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Loading Strategy for GraphQL Modules",
   "main": "dist/index.js",
   "repository": {
