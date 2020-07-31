@@ -16,56 +16,10 @@ This function is for loading your GraphQL API seamlessly from multiple places (f
 
 ## Install
 
-```
+```bash
 npm install --save @kaviar/loader
 ```
 
-## Usage
+## [Documentation](./DOCUMENTATION.md)
 
-```js
-import { Loader } from "@kaviar/loader";
-
-const loader = new Loader();
-
-loader.load({
-  // Can also be array of strings
-  typeDefs: `
-    type Query {
-      sayHello: String
-    }
-  `,
-
-  // Can also be array of resolvers
-  resolvers: {
-    Query: {
-      sayHello: () => "Hello world!",
-    },
-  },
-
-  // Can also be array of objects
-  schemaDirectives: {
-    name: MyDirective,
-  },
-
-  // Can be array of functions, we recommend to name your functions:
-  contextReducers: async function processNewVariables(context) {
-    return {
-      ...context,
-      newVariable: "newValue",
-    };
-  },
-});
-```
-
-## Getting it all together
-
-This would happen when you want to instantiate your server
-
-```js
-const {
-  typeDefs,
-  resolvers,
-  schemaDirectives,
-  contextReducers,
-} = loader.getSchema();
-```
+[Click here to go to the documentation](./DOCUMENTATION.md)

@@ -1,25 +1,26 @@
 import {
-  ContextReducer,
-  LoadOptions,
-  SchemaDirectiveType,
-  GraphQLModule,
-  ResolverMap,
+  IContextReducer,
+  ILoadOptions,
+  ISchemaDirectiveMap,
+  IGraphQLModule,
+  IResolverMap,
+  ISchemaResult,
 } from "./defs";
-import { mergeTypeDefs, mergeResolvers } from "@graphql-toolkit/schema-merging";
+import { mergeTypeDefs, mergeResolvers } from "@graphql-tools/merge";
 import { OneOrMore } from "./defs";
 
 export class Loader {
   protected typeDefs: string[] = [];
-  protected resolvers: ResolverMap[] = [];
-
-  protected schemaDirectives: SchemaDirectiveType[] = [];
-  protected contextReducers: ContextReducer[] = [];
+  protected resolvers: IResolverMap[] = [];
+  protected schemas: any[] = [];
+  protected schemaDirectives: ISchemaDirectiveMap[] = [];
+  protected contextReducers: IContextReducer[] = [];
 
   /**
    * Loads GraphQL stuff
    * @param options
    */
-  load(options: OneOrMore<LoadOptions>): void {
+  load(options: OneOrMore<ILoadOptions>): void {
     if (Array.isArray(options)) {
       return options.forEach((option) => this.load(option));
     }
@@ -35,15 +36,14 @@ export class Loader {
   /**
    * Returns the loaded schema
    */
-  getSchema(): GraphQLModule {
-    // Way too hackish, feel free to adapt
+  getSchema(): ISchemaResult {
     return {
       typeDefs: mergeTypeDefs(this.typeDefs, {
         throwOnConflict: true,
         commentDescriptions: true,
         reverseDirectives: true,
       }),
-      resolvers: mergeResolvers(this.resolvers as any),
+      resolvers: mergeResolvers(this.resolvers as any) as IResolverMap,
       schemaDirectives: this.mergeSchemaDirectives(),
       contextReducers: this.contextReducers,
     };
