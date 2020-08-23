@@ -11,10 +11,10 @@ describe("Extraction", () => {
 
     const schema = loader.getSchema();
 
-    assert.isTrue(schema.resolvers.Mutation.test1);
-    assert.isTrue(schema.resolvers.Mutation.test2);
-    assert.isTrue(schema.resolvers.Mutation.test3);
-    assert.isTrue(schema.resolvers.Mutation.test4);
+    assert.equal(schema.resolvers.A.test1, 1);
+    assert.equal(schema.resolvers.A.test2, 1);
+    assert.equal(schema.resolvers.A.test3, 1);
+    assert.equal(schema.resolvers.A.test4, 1);
 
     assert.include(schema.typeDefs, "somethingReallyGood");
     assert.include(schema.typeDefs, "somethingGood");
