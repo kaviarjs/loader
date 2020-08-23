@@ -1,18 +1,4 @@
-<h1 align="center">KAVIAR LOADER</h1>
-
-<p align="center">
-  <a href="https://travis-ci.org/kaviarjs/loader">
-    <img src="https://api.travis-ci.org/kaviarjs/loader.svg?branch=master" />
-  </a>
-  <a href="https://coveralls.io/github/kaviarjs/loader?branch=master">
-    <img src="https://coveralls.io/repos/github/kaviarjs/loader/badge.svg?branch=master" />
-  </a>
-</p>
-
-<br />
-<br />
-
-This function is for loading your GraphQL API seamlessly from multiple places (folders, files, npm packages, etc) so you can have them merged when you start your server. The basic scenario here is that you would have a startup file which loads all your modules which use a defined `loader`. And after that you import the file which starts the server and uses your `loader` to get the schema.
+This package is for loading your GraphQL API seamlessly from multiple places (folders, files, npm packages, etc) so you can have them merged when you start your server.
 
 ## Install
 
@@ -25,7 +11,10 @@ npm install --save @kaviar/loader
 ```js
 import { Loader } from "@kaviar/loader";
 
+// Without Kaviar Bundles
 const loader = new Loader();
+// Or inside prepare() phase of your Bundle
+const loader = container.get < Loader > Loader;
 
 loader.load({
   // Can also be array of strings
@@ -47,7 +36,8 @@ loader.load({
     name: MyDirective,
   },
 
-  // Can be array of functions, we recommend to name your functions:
+  // Can be array of functions, we recommend to name your functions
+  // So when it fails you can at least identify easily from where
   contextReducers: async function processNewVariables(context) {
     return {
       ...context,
@@ -72,32 +62,46 @@ const {
 
 ## Auto Loading
 
-Given that you store your resolvers in: `resolvers.ts` or in `*.resolvers.ts`, and your types in `*.graphql`, you are able to extract the loading module like this:
+Given that you store your resolvers in: `resolvers.ts` or in `*.resolvers.ts`, and your types in `*.graphql.ts`, you are able to extract the loading module like this:
 
 ```typescript
 // my-module/index.ts
 import { extract } from "@kaviar/loader";
 
+// This exports a GraphQL Module, directly laodable via loader.load()
 export default extract(__dirname);
 ```
 
-Then you are able to simply `loader.load(MyModule)`, the exported extract from the file.
+## Types
 
-When using typescript ensure you own a copy files command:
-
-```json
-{
-  "postcompile": "npm run prewatch",
-  "prewatch": "copyfiles -u 1 src/**/*.graphql dist/"
-}
+```typescript
+// User.graphql.ts
+export default /* GraphQL */ `
+  type User {
+    firstName: String!
+    lastName: String!
+    fullName: String!
+  }
+`;
 ```
 
-You also have the ability to store both resolvers and types in the same file via: `*.graphql.ts` files:
+```typescript
+// User.resolvers.ts
+export default {
+  User: {
+    fullName(user) {
+      return user.firstName + " " + user.lastName;
+    },
+  },
+};
+```
+
+You also have the ability to store both resolvers and types in the same file via: `*.graphql-module.ts` files:
 
 ```typescript
 // subfolder
 export default {
-  typeDefs: `
+  typeDefs: /* GraphQL */ `
     type Query {
       saySomething: String
     }

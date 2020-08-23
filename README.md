@@ -12,7 +12,7 @@
 <br />
 <br />
 
-This function is for loading your GraphQL API seamlessly from multiple places (folders, files, npm packages, etc) so you can have them merged when you start your server. The basic scenario here is that you would have a startup file which loads all your modules which use a defined `loader`. And after that you import the file which starts the server and uses your `loader` to get the schema.
+This package is for loading your GraphQL API seamlessly from multiple places (folders, files, npm packages, etc) so you can have them merged when you start your server.
 
 ## Install
 

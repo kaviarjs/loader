@@ -16,10 +16,10 @@ export function extract(dir): ILoadOptions {
   const resolversTopArray = loadFilesSync(
     path.join(dir, `./**/resolvers${EXT}`)
   );
-  const typesArray = loadFilesSync(path.join(dir, `./**/*.graphql`), {
-    extensions: ["graphql"],
-  });
-  const modulesArray = loadFilesSync(path.join(dir, `./**/*.graphql${EXT}`));
+  const typesArray = loadFilesSync(path.join(dir, `./**/*.graphql${EXT}`), {});
+  const modulesArray = loadFilesSync(
+    path.join(dir, `./**/*.graphql-module${EXT}`)
+  );
 
   const typesFromModule = modulesArray
     .map((m) => m.typeDefs)
