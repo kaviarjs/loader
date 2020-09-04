@@ -156,7 +156,7 @@ The function `postAdd` gets transformed to an array of functions:
 A more concrete example:
 
 ```typescript
-import { execute } from "@kaviar/executor";
+import { execute } from "@kaviar/graphql-bundle";
 
 load({
   typeDefs,
@@ -239,7 +239,7 @@ load({
 ```
 
 ```typescript
-import { getResult } from "@kaviar/executor";
+import { getResult } from "@kaviar/graphql-bundle";
 
 const ManipulateEndResponse = () => {
   return async function ManipulateEndResponse(_, args, ctx) {
@@ -260,7 +260,7 @@ const ManipulateEndResponse = () => {
 When you're creating logic you're most likely want to reuse it, this is why we introduce bundling plugins:
 
 ```typescript
-import { group } from "@kaviar/executor";
+import { group } from "@kaviar/graphql-bundle";
 
 load({
   typeDefs,

@@ -39,6 +39,7 @@ export class Loader {
    */
   getSchema(): ISchemaResult {
     const resolvers = this.getTransformedResolvers();
+
     return {
       typeDefs: mergeTypeDefs(this.typeDefs, {
         throwOnConflict: true,
@@ -57,11 +58,18 @@ export class Loader {
     const newResolvers = [];
     this.resolvers.forEach((resolver) => {
       ["Query", "Mutation"].forEach((rootType) => {
-        if (Array.isArray(resolver[rootType])) {
-          newResolvers.push(group(...resolver[rootType]));
-        } else {
-          newResolvers.push(execute(resolver[rootType]));
+        if (!resolver[rootType]) {
+          return;
         }
+
+        let newRootResolver;
+        if (Array.isArray(resolver[rootType])) {
+          newRootResolver = { [rootType]: group(...resolver[rootType]) };
+        } else {
+          newRootResolver = { [rootType]: execute(resolver[rootType]) };
+        }
+
+        newResolvers.push(newRootResolver);
       });
     });
 
