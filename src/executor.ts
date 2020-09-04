@@ -42,6 +42,13 @@ function craftFunction(
   before: ResolverFunction[] = [],
   after: ResolverFunction[] = []
 ) {
+  if (typeof definition === "function") {
+    if (before.length === 0 && after.length === 0) {
+      // Nothing to do here, no need to wrap this function with another function for no reason.
+      return definition;
+    }
+  }
+
   if (!Array.isArray(definition)) {
     definition = [definition];
   }

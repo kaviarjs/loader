@@ -56,21 +56,21 @@ export class Loader {
     // Transform resolvers for Query/Mutation
     // TODO: Do it for Subscription as well
     const newResolvers = [];
-    this.resolvers.forEach((resolver) => {
-      ["Query", "Mutation"].forEach((rootType) => {
-        if (!resolver[rootType]) {
-          return;
-        }
+    this.resolvers.forEach((resolverMap) => {
+      for (const rootType in resolverMap) {
+        if (["Query", "Mutation"].includes(rootType)) {
+          let newRootResolver;
+          if (Array.isArray(resolverMap[rootType])) {
+            newRootResolver = { [rootType]: group(...resolverMap[rootType]) };
+          } else {
+            newRootResolver = { [rootType]: execute(resolverMap[rootType]) };
+          }
 
-        let newRootResolver;
-        if (Array.isArray(resolver[rootType])) {
-          newRootResolver = { [rootType]: group(...resolver[rootType]) };
+          newResolvers.push(newRootResolver);
         } else {
-          newRootResolver = { [rootType]: execute(resolver[rootType]) };
+          newResolvers.push(resolverMap);
         }
-
-        newResolvers.push(newRootResolver);
-      });
+      }
     });
 
     return newResolvers;

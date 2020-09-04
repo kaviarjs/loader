@@ -1,5 +1,4 @@
 import TestModule from "./extract-test";
-import { extract } from "../extract";
 import { Loader } from "..";
 import { assert } from "chai";
 

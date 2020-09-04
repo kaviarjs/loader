@@ -1,6 +1,6 @@
 {
   "name": "@kaviar/graphql-bundle",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "Loading Strategy for GraphQL Modules",
   "main": "dist/index.js",
   "repository": {
@@ -9,7 +9,6 @@
   },
   "scripts": {
     "compile": "tsc",
-    "postcompile": "npm run prewatch",
     "watch": "tsc -w",
     "pretest": "npm run compile",
     "test": "jest --verbose dist/__tests__/index.js",
