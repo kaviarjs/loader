@@ -1,11 +1,11 @@
-<h1 align="center">KAVIAR LOADER</h1>
+<h1 align="center">KAVIAR GRAPHQL-BUNDLE</h1>
 
 <p align="center">
-  <a href="https://travis-ci.org/kaviarjs/loader">
-    <img src="https://api.travis-ci.org/kaviarjs/loader.svg?branch=master" />
+  <a href="https://travis-ci.org/kaviarjs/graphql-bundle">
+    <img src="https://api.travis-ci.org/kaviarjs/graphql-bundle.svg?branch=master" />
   </a>
-  <a href="https://coveralls.io/github/kaviarjs/loader?branch=master">
-    <img src="https://coveralls.io/repos/github/kaviarjs/loader/badge.svg?branch=master" />
+  <a href="https://coveralls.io/github/kaviarjs/graphql-bundle?branch=master">
+    <img src="https://coveralls.io/repos/github/kaviarjs/graphql-bundle/badge.svg?branch=master" />
   </a>
 </p>
 
@@ -17,7 +17,7 @@ This package is for loading your GraphQL API seamlessly from multiple places (fo
 ## Install
 
 ```bash
-npm install --save @kaviar/loader
+npm install --save @kaviar/graphql-bundle
 ```
 
 ## [Documentation](./DOCUMENTATION.md)

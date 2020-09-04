@@ -8,6 +8,7 @@ import {
 } from "./defs";
 import { mergeTypeDefs, mergeResolvers } from "@graphql-tools/merge";
 import { OneOrMore } from "./defs";
+import { group, execute } from "./executor";
 
 export class Loader {
   protected typeDefs: string[] = [];
@@ -37,16 +38,34 @@ export class Loader {
    * Returns the loaded schema
    */
   getSchema(): ISchemaResult {
+    const resolvers = this.getTransformedResolvers();
     return {
       typeDefs: mergeTypeDefs(this.typeDefs, {
         throwOnConflict: true,
         commentDescriptions: true,
         reverseDirectives: true,
       }),
-      resolvers: mergeResolvers(this.resolvers as any) as IResolverMap,
+      resolvers: mergeResolvers(resolvers) as IResolverMap,
       schemaDirectives: this.mergeSchemaDirectives(),
       contextReducers: this.contextReducers,
     };
+  }
+
+  protected getTransformedResolvers(): IResolverMap[] {
+    // Transform resolvers for Query/Mutation
+    // TODO: Do it for Subscription as well
+    const newResolvers = [];
+    this.resolvers.forEach((resolver) => {
+      ["Query", "Mutation"].forEach((rootType) => {
+        if (Array.isArray(resolver[rootType])) {
+          newResolvers.push(group(...resolver[rootType]));
+        } else {
+          newResolvers.push(execute(resolver[rootType]));
+        }
+      });
+    });
+
+    return newResolvers;
   }
 
   /**

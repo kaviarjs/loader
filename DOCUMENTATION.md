@@ -1,4 +1,11 @@
-This package is for loading your GraphQL API seamlessly from multiple places (folders, files, npm packages, etc) so you can have them merged when you start your server.
+The GraphQL Bundle is an abstract way to load your Type Definitions, Resolvers, Scalars, Context Transformers/Reducers in a unified place. We made this design choice to be able to hook it with any kind of GraphQL server without making any change to your code. For example, if there's another bundle that instantiates a GraphQL server, you can later swap it for let's say a `serverless` bundle without making any changes to your code.
+
+Besides this loading strategy this bundle comes with:
+
+- Mechanism to automatically load GraphQL files based on file system conventions
+- A composition strategy for your resolvers to re-use code
+
+It does automatic type and resolver merging and you can also load context manipulators and schema directives.
 
 ## Install
 
@@ -9,7 +16,7 @@ npm install --save @kaviar/loader
 ## Usage
 
 ```js
-import { Loader } from "@kaviar/loader";
+import { Loader } from "@kaviar/graphql-bundle";
 
 // Without Kaviar Bundles
 const loader = new Loader();
@@ -64,9 +71,8 @@ const {
 
 Given that you store your resolvers in: `resolvers.ts` or in `*.resolvers.ts`, and your types in `*.graphql.ts`, you are able to extract the loading module like this:
 
-```typescript
-// my-module/index.ts
-import { extract } from "@kaviar/loader";
+```typescript title="graphql/index.ts"
+import { extract } from "@kaviar/graphql-bundle";
 
 // This exports a GraphQL Module, directly laodable via loader.load()
 export default extract(__dirname);
@@ -74,8 +80,7 @@ export default extract(__dirname);
 
 ## Types
 
-```typescript
-// User.graphql.ts
+```typescript title="graphql/User.graphql.ts"
 export default /* GraphQL */ `
   type User {
     firstName: String!
@@ -85,8 +90,7 @@ export default /* GraphQL */ `
 `;
 ```
 
-```typescript
-// User.resolvers.ts
+```typescript title="graphql/User.resolvers.ts"
 export default {
   User: {
     fullName(user) {
@@ -96,10 +100,9 @@ export default {
 };
 ```
 
-You also have the ability to store both resolvers and types in the same file via: `*.graphql-module.ts` files:
+You also have the ability to store both resolvers and types or things such as context reducers and schema directives. You should use the `*.graphql-module.ts` files:
 
-```typescript
-// subfolder
+```typescript title="graphql/User.graphql-module.ts"
 export default {
   typeDefs: /* GraphQL */ `
     type Query {
@@ -112,4 +115,178 @@ export default {
     },
   },
 };
+```
+
+## Resolvers
+
+A resolver's job is usually:
+
+- Check if inputs are fine (Validation)
+- Check security and permission rights (Authorisation)
+- Execute the command delegated to a service (Delegation)
+- Manipulate the response to fit the client's request (Response Manipulation)
+
+Let's imagine our resolver, to add a post:
+
+```ts
+{
+  Mutation: {
+    PostAdd(_, args, ctx) {
+      // do it
+    }
+  }
+}
+```
+
+The function `postAdd` gets transformed to an array of functions:
+
+```ts
+{
+  Mutation: execute({
+    PostAdd: [
+      // Now you can chain functions which are executed in the order here
+      (_, args, ctx) => {
+        // do things
+      },
+    ],
+  });
+}
+```
+
+A more concrete example:
+
+```typescript
+import { execute } from "@kaviar/executor";
+
+load({
+  typeDefs,
+  resolvers: {
+    Query: execute({
+      PostAdd: [
+        async function (_, args, ctx) {
+          const postService = ctx.container.get(PostService);
+          return postService.addPost(args.post);
+        },
+      ],
+      PostRemove: [
+        // These are the plugins
+        CheckLoggedIn(),
+        CheckPostRights("postId"),
+        async (_, args, ctx) => {},
+      ],
+    }),
+  },
+});
+```
+
+## Plugins
+
+A plugin, is a function that returns a resolver function.
+
+Writing the `CheckLoggedIn` plugin:
+
+```typescript
+interface ICheckLoggedInConfig {
+  errorMessage?: string;
+}
+
+const CheckLoggedIn = async function (options: ICheckLoggedInConfig) {
+  if (options.errorMessage) {
+    options.errorMessage = "User not authorized";
+  }
+
+  // This returns a resolver function
+  return async function CheckLoggedIn(_, args, ctx) {
+    // We assume that if the user is ok, everytime we inject userId into the context
+    if (!ctx.userId) {
+      throw new Error(options.errorMessage);
+    }
+  };
+};
+```
+
+```typescript
+export default {
+  Query: execute({
+    PostAdd: [
+      CheckLoggedIn({ errorMessage: "Not allowed to add post" }),
+      async (_, args, ctx) => {
+        // Add the post as no exception was thrown
+      },
+    ],
+  }),
+};
+```
+
+## Response Manipulators
+
+You can also write response manipulators, for example your function returns undefined/false, but you want to return a success response:
+
+```typescript
+load({
+  typeDefs: `
+    type Response {
+      success: Boolean!
+      errorMessage: String
+    }
+  `,
+  resolvers: {
+    Query: execute({
+      Something: [() => "something", ManipulateEndResponse()],
+    }),
+  },
+});
+```
+
+```typescript
+import { getResult } from "@kaviar/executor";
+
+const ManipulateEndResponse = () => {
+  return async function ManipulateEndResponse(_, args, ctx) {
+    // The previous result in the execution pipeline is stored in the context
+    // The pipeline, however, will return the response of the last element in the pipeline
+    const previousResponse = getResult(ctx);
+
+    // Do whatever
+    return {
+      success: true,
+    };
+  };
+};
+```
+
+## Groups
+
+When you're creating logic you're most likely want to reuse it, this is why we introduce bundling plugins:
+
+```typescript
+import { group } from "@kaviar/executor";
+
+load({
+  typeDefs,
+  resolvers: {
+    Query: group(
+      // BEFORE PLUGINS
+      [CheckLoggedIn()],
+
+      // EXECUTION MAP
+      {
+        PostAdd: async (_, args, ctx, x) => {
+          const postService = ctx.container.get(PostService);
+          return postService.addPost(args.post);
+        },
+
+        PostRemove: [
+          CheckPostRights("postId"),
+          async (_, args, ctx) => {
+            // Run check for post rights
+          },
+        ],
+      },
+
+      // AFTER
+      [ManipulateEndResponse()]
+    ),
+  },
+});
 ```

@@ -1,15 +1,31 @@
 import { GraphQLScalarType } from "graphql";
 
+/**
+ * This interface shall be used to extend the context
+ */
+export interface IGraphQLContext {}
+
 export type OneOrMore<T> = T | T[];
 export type Constructor<T> = { new (...args: any[]): T };
 
-export interface IFunctionMap<ArgsType = any, ContextType = any> {
-  [key: string]: (
-    root: any,
-    args: ArgsType,
-    context: ContextType,
-    info: any
-  ) => any;
+export type SubscriptionResolver = {
+  subscribe: GraphQLResolverFunction;
+  resolve?: (payload: any) => any;
+};
+
+export type GraphQLResolverFunction = (
+  root: any,
+  args: any,
+  context: IGraphQLContext,
+  info: any
+) => any;
+
+export interface IFunctionMapSimple {
+  [key: string]: GraphQLResolverFunction;
+}
+
+export interface IFunctionMap {
+  [key: string]: OneOrMore<GraphQLResolverFunction>;
 }
 
 export interface ISchemaDirectiveMap {
@@ -24,26 +40,21 @@ export interface ILoadOptions {
 }
 
 export interface ISubscriptionFunctionMap {
-  [key: string]: {
-    subscribe: (root: any, args: any, context: any, info: any) => any;
-    resolve?: (payload: any) => any;
-  };
+  [key: string]: OneOrMore<SubscriptionResolver>;
 }
 
 export type IContextReducer = (context: any) => any;
 
 export interface IResolverMap {
-  Query?: IFunctionMap;
-  Mutation?: IFunctionMap;
-  Subscription?: ISubscriptionFunctionMap;
+  Query?: OneOrMore<IFunctionMap>;
+  Mutation?: OneOrMore<IFunctionMap>;
+  Subscription?: OneOrMore<ISubscriptionFunctionMap>;
   [key: string]:
     | IFunctionMap
     | ISubscriptionFunctionMap
     | GraphQLScalarType
     | any;
 }
-
-export interface IGraphQLContext {}
 
 export interface IGraphQLModule {
   typeDefs?: string | string[];
@@ -57,10 +68,4 @@ export interface ISchemaResult {
   resolvers?: IResolverMap;
   schemaDirectives?: ISchemaDirectiveMap;
   contextReducers: IContextReducer[];
-}
-
-export interface IType<ContextType = any> {
-  name?: string;
-  resolvers?: IFunctionMap<any, ContextType>;
-  typeDefs?: string;
 }
