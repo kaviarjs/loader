@@ -46,9 +46,13 @@ export interface ISubscriptionFunctionMap {
 export type IContextReducer = (context: any) => any;
 
 export interface IResolverMap {
-  Query?: OneOrMore<IFunctionMap>;
-  Mutation?: OneOrMore<IFunctionMap>;
-  Subscription?: OneOrMore<ISubscriptionFunctionMap>;
+  Query?:
+    | IFunctionMap
+    | [GraphQLResolverFunction[], IFunctionMap, GraphQLResolverFunction[]];
+  Mutation?:
+    | IFunctionMap
+    | [GraphQLResolverFunction[], IFunctionMap, GraphQLResolverFunction[]];
+  Subscription?: ISubscriptionFunctionMap;
   [key: string]:
     | IFunctionMap
     | ISubscriptionFunctionMap

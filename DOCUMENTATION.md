@@ -10,18 +10,24 @@ It does automatic type and resolver merging and you can also load context manipu
 ## Install
 
 ```
-npm install --save @kaviar/loader
+npm install --save @kaviar/graphql-bundle
+```
+
+Register it easily:
+
+```ts
+kernel.addBundle(new GraphQLBundle());
 ```
 
 ## Usage
 
-```js
+```typescript
 import { Loader } from "@kaviar/graphql-bundle";
 
 // Without Kaviar Bundles
 const loader = new Loader();
 // Or inside prepare() phase of your Bundle
-const loader = container.get < Loader > Loader;
+const loader = container.get<Loader>(Loader);
 
 loader.load({
   // Can also be array of strings
@@ -58,7 +64,7 @@ loader.load({
 
 This would happen when you want to instantiate your server
 
-```js
+```typescript
 const {
   typeDefs,
   resolvers,
@@ -142,14 +148,14 @@ The function `postAdd` gets transformed to an array of functions:
 
 ```ts
 {
-  Mutation: execute({
+  Mutation: {
     PostAdd: [
       // Now you can chain functions which are executed in the order here
       (_, args, ctx) => {
         // do things
       },
     ],
-  });
+  };
 }
 ```
 
@@ -161,7 +167,7 @@ import { execute } from "@kaviar/graphql-bundle";
 load({
   typeDefs,
   resolvers: {
-    Query: execute({
+    Query: {
       PostAdd: [
         async function (_, args, ctx) {
           const postService = ctx.container.get(PostService);
@@ -174,7 +180,7 @@ load({
         CheckPostRights("postId"),
         async (_, args, ctx) => {},
       ],
-    }),
+    },
   },
 });
 ```
@@ -207,14 +213,14 @@ const CheckLoggedIn = async function (options: ICheckLoggedInConfig) {
 
 ```typescript
 export default {
-  Query: execute({
+  Query: {
     PostAdd: [
       CheckLoggedIn({ errorMessage: "Not allowed to add post" }),
       async (_, args, ctx) => {
         // Add the post as no exception was thrown
       },
     ],
-  }),
+  },
 };
 ```
 
@@ -231,9 +237,9 @@ load({
     }
   `,
   resolvers: {
-    Query: execute({
+    Query: {
       Something: [() => "something", ManipulateEndResponse()],
-    }),
+    },
   },
 });
 ```
@@ -260,12 +266,10 @@ const ManipulateEndResponse = () => {
 When you're creating logic you're most likely want to reuse it, this is why we introduce bundling plugins:
 
 ```typescript
-import { group } from "@kaviar/graphql-bundle";
-
 load({
   typeDefs,
   resolvers: {
-    Query: group(
+    Query: [
       // BEFORE PLUGINS
       [CheckLoggedIn()],
 
@@ -285,8 +289,8 @@ load({
       },
 
       // AFTER
-      [ManipulateEndResponse()]
-    ),
+      [ManipulateEndResponse()],
+    ],
   },
 });
 ```
