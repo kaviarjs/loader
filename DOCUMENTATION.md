@@ -294,3 +294,34 @@ load({
   },
 });
 ```
+
+## Types
+
+When we are dealing with a GraphQL resolver, there are 2 things we need types for usually: arguments and context. While context is the same from resolver to resolver, arguments change.
+
+You can have additional context reducers which extend your context, to type them, use the following strategy:
+
+```ts title="defs.ts"
+import "@kaviar/graphql-bundle";
+
+declare module "@kaviar/graphql-bundle" {
+  export interface IGraphQLContext {
+    myValue: string;
+  }
+}
+```
+
+For arguments, you either use a generator to transform your GraphQL types into TypeScript and you can use them. But usually you would use models and the arguments should be input: InputType. This is why you can do:
+
+```ts title="a sample resolver"
+import { InputType } from "@kaviar/graphql-bundle";
+
+type RegisterInput = {
+  myValue: string;
+};
+
+function register(_, args: InputType<RegisterInput>, context: IGraphQLContext) {
+  const { input } = args;
+  // Type safety on input, as it is RegisterInput
+}
+```

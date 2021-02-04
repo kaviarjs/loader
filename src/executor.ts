@@ -1,6 +1,4 @@
-import { IResolverMap, IFunctionMap } from "./defs";
-
-export type ResolverFunction = (root, args, context, info) => any;
+import { IResolverMap, IFunctionMap, GraphQLResolverFunction } from "./defs";
 
 /**
  * This is the symbol in which we store the result that can be used by the next resolver plugin
@@ -25,9 +23,9 @@ export function execute(map: IFunctionMap): IFunctionMap {
 }
 
 export function group(
-  before: ResolverFunction[] = [],
+  before: GraphQLResolverFunction[] = [],
   map: IFunctionMap = {},
-  after: ResolverFunction[] = []
+  after: GraphQLResolverFunction[] = []
 ): IResolverMap {
   const newMap = {};
   for (const key in map) {
@@ -37,10 +35,10 @@ export function group(
   return newMap;
 }
 
-function craftFunction(
-  definition: ResolverFunction | ResolverFunction[],
-  before: ResolverFunction[] = [],
-  after: ResolverFunction[] = []
+export function craftFunction(
+  definition: GraphQLResolverFunction | GraphQLResolverFunction[],
+  before: GraphQLResolverFunction[] = [],
+  after: GraphQLResolverFunction[] = []
 ) {
   if (typeof definition === "function") {
     if (before.length === 0 && after.length === 0) {

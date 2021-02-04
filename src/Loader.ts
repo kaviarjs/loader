@@ -7,9 +7,12 @@ import {
   ISchemaResult,
 } from "./defs";
 import { mergeTypeDefs, mergeResolvers } from "@graphql-tools/merge";
-import { OneOrMore } from "./defs";
-import { group, execute } from "./executor";
+import { OneOrMore, SubscriptionResolver } from "./defs";
+import { group, execute, craftFunction } from "./executor";
+import { Service } from "@kaviar/core";
+import { subscribe } from "../../graphql-final/subscription/subscribe";
 
+@Service()
 export class Loader {
   protected typeDefs: string[] = [];
   protected resolvers: IResolverMap[] = [];
@@ -67,6 +70,22 @@ export class Loader {
           }
 
           newResolvers.push(newRootResolver);
+        } else if (rootType === "Subscription") {
+          // Subscriptions resolvers are composed of two parts, resolve & subscribe
+          // We only need to allow subscribe to work well
+          const resolverMap = {};
+          for (const key in resolverMap[rootType]) {
+            let newResolver: Partial<SubscriptionResolver> = Object.assign(
+              {
+                resolve: (payload) => payload,
+              },
+              resolverMap[rootType][key]
+            );
+
+            newResolver.subscribe = craftFunction(newResolver.subscribe);
+            resolverMap[key] = newResolver;
+          }
+          newResolvers.push(resolverMap);
         } else {
           newResolvers.push(resolverMap);
         }

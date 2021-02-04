@@ -5,11 +5,15 @@ import { GraphQLScalarType } from "graphql";
  */
 export interface IGraphQLContext {}
 
+export type InputType<T> = {
+  input: T;
+};
+
 export type OneOrMore<T> = T | T[];
 export type Constructor<T> = { new (...args: any[]): T };
 
 export type SubscriptionResolver = {
-  subscribe: GraphQLResolverFunction;
+  subscribe: GraphQLResolverFunction | GraphQLResolverFunction[];
   resolve?: (payload: any) => any;
 };
 
