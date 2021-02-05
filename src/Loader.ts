@@ -73,7 +73,7 @@ export class Loader {
         } else if (rootType === "Subscription") {
           // Subscriptions resolvers are composed of two parts, resolve & subscribe
           // We only need to allow subscribe to work well
-          const resolverMap = {};
+          const newResolverMap = {};
           for (const key in resolverMap[rootType]) {
             let newResolver: Partial<SubscriptionResolver> = Object.assign(
               {
@@ -83,9 +83,9 @@ export class Loader {
             );
 
             newResolver.subscribe = craftFunction(newResolver.subscribe);
-            resolverMap[key] = newResolver;
+            newResolverMap[key] = newResolver;
           }
-          newResolvers.push(resolverMap);
+          newResolvers.push({ Subscription: newResolverMap });
         } else {
           newResolvers.push(resolverMap);
         }

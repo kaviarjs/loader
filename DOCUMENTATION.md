@@ -311,7 +311,7 @@ declare module "@kaviar/graphql-bundle" {
 }
 ```
 
-For arguments, you either use a generator to transform your GraphQL types into TypeScript and you can use them. But usually you would use models and the arguments should be input: InputType. This is why you can do:
+For arguments, you either use a generator to transform your GraphQL types into TypeScript. Which can be good but that's an extra process you have to take care of. Usually you would use models that can be validated and the arguments should look like `register(input: RegisterInput!): String`. This is why you can do, in most cases, something like:
 
 ```ts title="a sample resolver"
 import { InputType } from "@kaviar/graphql-bundle";
