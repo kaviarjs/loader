@@ -49,13 +49,16 @@ export interface ISubscriptionFunctionMap {
 
 export type IContextReducer = (context: any) => any;
 
+/**
+ * The resolver map contains chaining at resolver level, but you can also add previous and after chains by specifying them as arrays
+ */
 export interface IResolverMap {
   Query?:
     | IFunctionMap
-    | [GraphQLResolverFunction[], IFunctionMap, GraphQLResolverFunction[]];
+    | [GraphQLResolverFunction[], IFunctionMap, GraphQLResolverFunction[]?];
   Mutation?:
     | IFunctionMap
-    | [GraphQLResolverFunction[], IFunctionMap, GraphQLResolverFunction[]];
+    | [GraphQLResolverFunction[], IFunctionMap, GraphQLResolverFunction[]?];
   Subscription?: ISubscriptionFunctionMap;
   [key: string]:
     | IFunctionMap
