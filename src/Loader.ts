@@ -10,7 +10,6 @@ import { mergeTypeDefs, mergeResolvers } from "@graphql-tools/merge";
 import { OneOrMore, SubscriptionResolver } from "./defs";
 import { group, execute, craftFunction } from "./executor";
 import { Service } from "@kaviar/core";
-import { subscribe } from "../../graphql-final/subscription/subscribe";
 
 @Service()
 export class Loader {
