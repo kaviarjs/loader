@@ -99,18 +99,22 @@ export default /* GraphQL */ `
 ```
 
 ```typescript title="graphql/User.resolvers.ts"
+import { IResolverMap } from "@kaviar/graphql-bundle";
+
 export default {
   User: {
     fullName(user) {
       return user.firstName + " " + user.lastName;
     },
   },
-};
+} as IResolverMap; // We are using this so we benefit of autocompletion
 ```
 
 You also have the ability to store both resolvers and types or things such as context reducers and schema directives. You should use the `*.graphql-module.ts` files:
 
 ```typescript title="graphql/User.graphql-module.ts"
+import { IResolverMap } from "@kaviar/graphql-bundle";
+
 export default {
   typeDefs: /* GraphQL */ `
     type Query {
@@ -120,7 +124,7 @@ export default {
   resolvers: {
     Query: {
       saySomething: () => "Hi!",
-    },
+    } as IResolverMap,
   },
 };
 ```
