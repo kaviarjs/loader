@@ -1,9 +1,5 @@
 import { GraphQLScalarType } from "graphql";
-
-/**
- * This interface shall be used to extend the context
- */
-export interface IGraphQLContext {}
+import { IGraphQLContext } from "./";
 
 export type InputType<T> = {
   input: T;
@@ -52,13 +48,15 @@ export type IContextReducer = (context: any) => any;
 /**
  * The resolver map contains chaining at resolver level, but you can also add previous and after chains by specifying them as arrays
  */
+export type GroupedResolvers = [
+  GraphQLResolverFunction[],
+  IFunctionMap,
+  Array<GraphQLResolverFunction>?
+];
+
 export interface IResolverMap {
-  Query?:
-    | IFunctionMap
-    | [GraphQLResolverFunction[], IFunctionMap, GraphQLResolverFunction[]?];
-  Mutation?:
-    | IFunctionMap
-    | [GraphQLResolverFunction[], IFunctionMap, GraphQLResolverFunction[]?];
+  Query?: IFunctionMap | GroupedResolvers;
+  Mutation?: IFunctionMap | GroupedResolvers;
   Subscription?: ISubscriptionFunctionMap;
   [key: string]:
     | IFunctionMap
